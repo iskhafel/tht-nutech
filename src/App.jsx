@@ -10,11 +10,14 @@ import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 import Dashboard from "./pages/dashboard/Dashboard";
 import TopUp from "./pages/topup/TopUp";
+import Transaction from "./pages/transaction/Transaction";
+import TransactionHistory from "./pages/transaction/TransactionHistory";
+import Account from "./pages/account/Account";
+import EditAccount from "./pages/account/EditAccount";
 
 const App = () => {
   const { isAuthenticated } = useSelector((state) => state.auth);
 
-  // Protected Route Logic
   const ProtectedRoute = ({ children }) => {
     if (!isAuthenticated) {
       return <Navigate to="/login" replace />;
@@ -25,11 +28,9 @@ const App = () => {
   return (
     <Router>
       <Routes>
-        {/* Public Routes */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
 
-        {/* Protected Routes */}
         <Route
           path="/dashboard"
           element={
@@ -38,6 +39,7 @@ const App = () => {
             </ProtectedRoute>
           }
         />
+
         <Route
           path="/top-up"
           element={
@@ -47,8 +49,43 @@ const App = () => {
           }
         />
 
-        {/* Redirect unknown routes to login */}
-        <Route path="*" element={<Navigate to="/login" replace />} />
+        <Route
+          path="/transaction"
+          element={
+            <ProtectedRoute>
+              <Transaction />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/transaction/history"
+          element={
+            <ProtectedRoute>
+              <TransactionHistory />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/account"
+          element={
+            <ProtectedRoute>
+              <Account />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/account/edit"
+          element={
+            <ProtectedRoute>
+              <EditAccount />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route path="/" element={<Navigate to="/dashboard" />} />
       </Routes>
     </Router>
   );

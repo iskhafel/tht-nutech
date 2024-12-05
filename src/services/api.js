@@ -30,7 +30,6 @@ export const loginUser = async (data) => {
   }
 };
 
-// Function to fetch user data
 export const fetchUser = async (token) => {
   const response = await api.get("/profile", {
     headers: { Authorization: `Bearer ${token}` },
@@ -38,7 +37,6 @@ export const fetchUser = async (token) => {
   return response.data.data;
 };
 
-// Function to fetch banners
 export const fetchBanner = async (token) => {
   const response = await api.get("/banner", {
     headers: { Authorization: `Bearer ${token}` },
@@ -46,7 +44,6 @@ export const fetchBanner = async (token) => {
   return response.data.data;
 };
 
-// Function to fetch services
 export const fetchServices = async (token) => {
   const response = await api.get("/services", {
     headers: { Authorization: `Bearer ${token}` },
@@ -54,17 +51,8 @@ export const fetchServices = async (token) => {
   return response.data.data;
 };
 
-// Function to fetch balance
 export const fetchBalance = async (token) => {
   const response = await api.get("/balance", {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  return response.data.data;
-};
-
-// Function to topup user balance
-export const topupBalance = async (token) => {
-  const response = await api.post("/top-up", {
     headers: { Authorization: `Bearer ${token}` },
   });
   return response.data.data;

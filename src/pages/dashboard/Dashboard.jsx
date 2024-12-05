@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchDashboardData } from "./dashboardSlice";
 import { FiEye, FiEyeOff } from "react-icons/fi";
+import { Link } from "react-router-dom";
 
 const Dashboard = () => {
   const dispatch = useDispatch();
@@ -11,36 +12,34 @@ const Dashboard = () => {
 
   const [balanceVisible, setBalanceVisible] = useState(false);
 
-  // Fetch data when the component mounts
   useEffect(() => {
     dispatch(fetchDashboardData());
   }, [dispatch]);
 
-  // Main UI remains unchanged
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="flex justify-between items-center px-12 py-4 bg-white shadow-md">
         <div className="flex items-center space-x-4">
           <img src="./src/assets/Logo.png" alt="SIMS PPOB Logo" />
-          <h1 className="text-xl font-bold">SIMS PPOB</h1>
+          <Link to="/" className="text-xl font-bold">
+            SIMS PPOB
+          </Link>
         </div>
         <nav className="flex space-x-6 font-bold">
-          <a href="/top-up" className="text-gray-700 hover:text-red-500">
+          <Link to="/top-up" className="text-gray-700 hover:text-red-500">
             Top Up
-          </a>
-          <a href="/transactions" className="text-gray-700 hover:text-red-500">
+          </Link>
+          <Link to="/transaction" className="text-gray-700 hover:text-red-500">
             Transaction
-          </a>
-          <a href="/account" className="text-gray-700 hover:text-red-500">
+          </Link>
+          <Link to="/account" className="text-gray-700 hover:text-red-500">
             Akun
-          </a>
+          </Link>
         </nav>
       </header>
 
-      {/* Main Content */}
       <main className="px-8 py-6">
-        {/* User Info */}
         <div className="flex justify-between">
           {user && (
             <section className="flex flex-col space-x-4 mb-6 w-1/2">
@@ -56,7 +55,6 @@ const Dashboard = () => {
             </section>
           )}
 
-          {/* Balance Section */}
           {balance && (
             <section className="bg-red-500 text-white rounded-lg p-6 mb-6 w-1/2">
               <div className="flex justify-between items-center">
@@ -85,7 +83,6 @@ const Dashboard = () => {
           )}
         </div>
 
-        {/* Services Section */}
         {services && (
           <section className="my-6">
             <div className="flex flex-row gap-4 bg-white rounded-lg">
@@ -99,14 +96,15 @@ const Dashboard = () => {
                     alt={item.service_code}
                     className="w-16 h-16 mb-2"
                   />
-                  <p className="text-sm font-medium">{item.service_name}</p>
+                  <p className="text-sm font-medium text-center">
+                    {item.service_name}
+                  </p>
                 </div>
               ))}
             </div>
           </section>
         )}
 
-        {/* Banner Section */}
         {banners && (
           <section>
             <h3 className="text-xl font-bold mb-4">Temukan promo menarik</h3>

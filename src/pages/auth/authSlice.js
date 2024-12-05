@@ -1,15 +1,13 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { loginUser } from "../../services/api";
 
-// Initial state for authentication
 const initialState = {
-  token: localStorage.getItem("token") || null, // Persist token in localStorage
-  isAuthenticated: !!localStorage.getItem("token"), // Boolean to track login status
+  token: localStorage.getItem("token") || null,
+  isAuthenticated: !!localStorage.getItem("token"),
   loading: false,
   error: null,
 };
 
-// Async thunk for login
 export const login = createAsyncThunk(
   "auth/login",
   async (credentials, { rejectWithValue }) => {
@@ -22,7 +20,6 @@ export const login = createAsyncThunk(
   }
 );
 
-// Auth slice
 const authSlice = createSlice({
   name: "auth",
   initialState,
@@ -52,6 +49,5 @@ const authSlice = createSlice({
   },
 });
 
-// Export actions and reducer
 export const { logout } = authSlice.actions;
 export default authSlice.reducer;

@@ -3,18 +3,21 @@ import { useEffect, useState } from "react";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import Image1 from "../../assets/Logo.png";
 
-const TopUp = () => {
+const TransactionHistory = () => {
   const [user, setUser] = useState(null);
   const [balance, setBalance] = useState(null);
   const [balanceVisible, setBalanceVisible] = useState(false);
-  const [error, setError] = useState(null);
-  const [amount, setAmount] = useState(0);
+  const [transactions, setTransactions] = useState([]);
+  const [offset, setOffset] = useState(0);
+  const [limit, setLimit] = useState(3); // Default limit per page
   const [loading, setLoading] = useState(false);
-  const predefinedAmounts = [10000, 20000, 50000, 100000, 250000, 500000];
+  const [error, setError] = useState(null);
 
   const token = localStorage.getItem("token");
 
+  // Fetch user data
   const fetchUser = async () => {
     try {
       const response = await axios.get(
@@ -31,6 +34,7 @@ const TopUp = () => {
     }
   };
 
+  // Fetch balance
   const fetchBalance = async () => {
     try {
       const response = await axios.get(
@@ -43,42 +47,47 @@ const TopUp = () => {
       );
       setBalance(response.data.data);
     } catch (error) {
-      console.error("Error fetching user:", error);
+      console.error("Error fetching balance:", error);
     }
   };
 
-  const handleTopUp = async () => {
+  // Fetch transaction history
+  const fetchTransactionHistory = async () => {
+    setLoading(true);
     try {
-      const response = await axios.post(
-        "https://take-home-test-api.nutech-integrasi.com/topup",
-        {
-          top_up_amount: amount,
-        },
+      const response = await axios.get(
+        `https://take-home-test-api.nutech-integrasi.com/transaction/history?offset=${offset}&limit=${limit}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         }
       );
-      console.log(response);
-      setAmount(0);
-      setError(null);
-      fetchBalance(); // Refresh balance after successful top-up
+      setTransactions(response.data.data.records);
     } catch (error) {
-      setError(error.response.data.message);
+      console.error("Error fetching transactions:", error);
+      setError(error.response?.data?.message || "Failed to load transactions.");
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
     fetchUser();
     fetchBalance();
-  }, []);
+    fetchTransactionHistory();
+  }, [offset]); // Refetch transactions when offset changes
+
+  const handleShowMore = () => {
+    setOffset(offset + limit);
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Header */}
       <header className="flex justify-between items-center px-12 py-4 bg-white shadow-md">
         <div className="flex items-center space-x-4">
-          <img src="./src/assets/Logo.png" alt="SIMS PPOB Logo" />
+          <img src={Image1} alt="SIMS PPOB Logo" />
           <Link to="/" className="text-xl font-bold">
             SIMS PPOB
           </Link>
@@ -90,14 +99,16 @@ const TopUp = () => {
           <Link to="/transaction" className="text-gray-700 hover:text-red-500">
             Transaction
           </Link>
-          <Link to="/account" className="text-gray-700 hover:text-red-500">
+          <Link to="/account" className="text-red-500 hover:text-red-700">
             Akun
           </Link>
         </nav>
       </header>
 
+      {/* Main Content */}
       <main className="px-8 py-6">
         <div className="flex justify-between">
+          {/* User Info */}
           {user && (
             <section className="flex flex-col space-x-4 mb-6 w-1/2">
               <img
@@ -112,6 +123,7 @@ const TopUp = () => {
             </section>
           )}
 
+          {/* Balance Section */}
           {balance && (
             <section className="bg-red-500 text-white rounded-lg p-6 mb-6 w-1/2">
               <div className="flex justify-between items-center">
@@ -126,7 +138,7 @@ const TopUp = () => {
                   >
                     {balanceVisible ? (
                       <>
-                        <FiEyeOff className="mr-2" /> Sembunyikan Saldo
+                        <FiEyeOff className="mr-2" /> Tutup Saldo
                       </>
                     ) : (
                       <>
@@ -140,57 +152,50 @@ const TopUp = () => {
           )}
         </div>
 
-        {/* Top-Up Section */}
+        {/* Transaction History Section */}
         <section className="mt-8 px-4 py-6">
-          <div className="flex flex-col items-start">
-            <p className="text-xl font-bold mb-2 text-gray-600">
-              Silahkan masukan
-            </p>
-            <h2 className="text-2xl font-bold mb-10">Nominal Top Up</h2>
-          </div>
-
-          <div className="w-full flex flex-row gap-6">
-            <div className="flex flex-col mb-6 w-2/3 space-y-4">
-              <input
-                type="number"
-                placeholder="Masukan nominal Top Up"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                className="flex-1 px-4 py-3 border rounded-lg focus:ring-2 focus:ring-red-500 outline-none"
-              />
-              <button
-                onClick={handleTopUp}
-                className={`px-6 py-3 rounded-lg text-white font-bold ${
-                  loading
-                    ? "bg-gray-400 cursor-not-allowed"
-                    : "bg-gray-400 hover:bg-red-600"
-                }`}
-                disabled={loading}
+          <h3 className="text-xl font-bold mb-4">Semua Transaksi</h3>
+          {loading && <p>Loading...</p>}
+          {error && <p className="text-red-500">{error}</p>}
+          <ul className="space-y-4">
+            {transactions.map((transaction) => (
+              <li
+                key={transaction.description}
+                className="flex justify-between items-center bg-white p-4 rounded-lg shadow"
               >
-                {loading ? "Processing..." : "Top Up"}
-              </button>
-            </div>
-
-            {/* Predefined Amount Buttons */}
-            <div className="grid grid-cols-3 gap-4 w-1/3">
-              {predefinedAmounts.map((value) => (
-                <button
-                  key={value}
-                  onClick={() => setAmount(value)}
-                  className="border rounded-lg py-2 px-4 text-center hover:bg-gray-100 focus:bg-gray-200"
-                >
-                  Rp{value.toLocaleString()}
-                </button>
-              ))}
-            </div>
-
-            {/* Error Message */}
-            {error && <p className="text-red-500 mt-4">{error}</p>}
-          </div>
+                <div>
+                  <p
+                    className={`text-lg font-bold ${
+                      transaction.transaction_type === "TOPUP"
+                        ? "text-green-500"
+                        : "text-red-500"
+                    }`}
+                  >
+                    {transaction.transaction_type === "TOPUP"
+                      ? `+ Rp${transaction.total_amount.toLocaleString()}`
+                      : `- Rp${transaction.total_amount.toLocaleString()}`}
+                  </p>
+                  <p className="text-sm text-gray-500">
+                    {new Date(transaction.created_on).toLocaleString("id-ID", {
+                      dateStyle: "long",
+                      timeStyle: "short",
+                    })}
+                  </p>
+                </div>
+                <p className="text-gray-500">{transaction.description}</p>
+              </li>
+            ))}
+          </ul>
+          <button
+            onClick={handleShowMore}
+            className="mt-6 text-red-500 hover:text-red-700 font-bold"
+          >
+            Show more
+          </button>
         </section>
       </main>
     </div>
   );
 };
 
-export default TopUp;
+export default TransactionHistory;
