@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { loginUser } from "../services/api";
-import Image from "../assets/Illustrasi Login.png";
-import Logo from "../assets/Logo.png";
+import { loginUser } from "../../services/api";
+import Image from "../../assets/Illustrasi Login.png";
+import Logo from "../../assets/Logo.png";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import { MdAlternateEmail, MdLock } from "react-icons/md";
 import { Link, useNavigate } from "react-router-dom";
