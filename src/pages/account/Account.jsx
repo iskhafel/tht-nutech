@@ -28,7 +28,8 @@ const Account = () => {
 
   const handleLogout = () => {
     localStorage.removeItem("token");
-    navigate("/login");
+    navigate("/", { replace: true }); // Navigate to the login page immediately
+    window.location.reload(); // Reload the page to clear all state
   };
 
   useEffect(() => {

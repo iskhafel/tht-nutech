@@ -33,9 +33,8 @@ const Login = () => {
         localStorage.setItem("token", response.data.token);
 
         setSuccessMessage("Login successful!");
-        setTimeout(() => {
-          navigate("/");
-        }, 2000);
+        navigate("/dashboard", { replace: true }); // Navigate immediately
+        window.location.reload(); // Reload the page to fully refresh state
       })
       .catch((err) => {
         setError(err.message || "Invalid login credentials.");

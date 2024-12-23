@@ -5,7 +5,9 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { useEffect } from "react";
+import { login } from "./pages/auth/authSlice";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 import Dashboard from "./pages/dashboard/Dashboard";
@@ -17,10 +19,26 @@ import EditAccount from "./pages/account/EditAccount";
 
 const App = () => {
   const { isAuthenticated } = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
+
+  // Sync Redux state with token on app load
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      dispatch(login.fulfilled(token)); // Sync Redux state with token
+    }
+  }, [dispatch]);
 
   const ProtectedRoute = ({ children }) => {
     if (!isAuthenticated) {
-      return <Navigate to="/login" replace />;
+      return <Navigate to="/" replace />;
+    }
+    return children;
+  };
+
+  const AuthRedirectRoute = ({ children }) => {
+    if (isAuthenticated) {
+      return <Navigate to="/dashboard" replace />;
     }
     return children;
   };
@@ -28,8 +46,23 @@ const App = () => {
   return (
     <Router>
       <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+        {/* Redirect to /dashboard if authenticated */}
+        <Route
+          path="/"
+          element={
+            <AuthRedirectRoute>
+              <Login />
+            </AuthRedirectRoute>
+          }
+        />
+        <Route
+          path="/register"
+          element={
+            <AuthRedirectRoute>
+              <Register />
+            </AuthRedirectRoute>
+          }
+        />
 
         <Route
           path="/dashboard"
@@ -84,8 +117,6 @@ const App = () => {
             </ProtectedRoute>
           }
         />
-
-        <Route path="/" element={<Navigate to="/dashboard" />} />
       </Routes>
     </Router>
   );
